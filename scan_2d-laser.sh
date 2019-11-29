@@ -22,7 +22,7 @@ echo "Saved 2D Laser IP =" $ip_s
 # Looping to scan IP address
 while true; do
 	echo "Scan IP..."
-	ip_r=$(/flash/arp-scan -q -i 1u -r 1 -I eth0 10.0.0.0/16 | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[0-9]{1,2}($|[^0-9])' | tr '\t' ' ' | cut -d' ' -f1)
+	ip_r=$(/flash/arp-scan -q -x -i 1u -r 1 -I eth0 10.0.0.0/16 | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[0-9]{1,2}($|[^0-9])' | tr '\t' ' ' | cut -d' ' -f1)
 	[ ! -z "$ip_r" ] && break
 	echo "Not found 2D Laser IP..."
 	sleep 1
