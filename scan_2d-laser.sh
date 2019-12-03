@@ -5,6 +5,8 @@ export LD_LIBRARY_PATH=/flash
 # Get saved 2D Laser IP address from def view serial
 ip_s=$(def view serial | grep -A 4 '\[ 3\]' | grep 'Remote' | cut -d' ' -f10)
 echo "Saved 2D Laser IP =" $ip_s
+# Get valid 2D Laser IP address
+ip_s=$(echo $ip_s | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[0-9]{1,2}($|[^0-9])')
 
 # Check saved 2D Laser IP address is available
 [ ! -z "$ip_s" ] && {
@@ -17,6 +19,8 @@ echo "Saved 2D Laser IP =" $ip_s
 		exit 0
 		}
 	echo "Check failed 2D Laser IP =" $ip_s
+	} || {
+	echo "Saved 2D Laser IP is not valid!"
 	}
 
 # Looping to scan 2D Laser IP address
