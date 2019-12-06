@@ -13,7 +13,6 @@ ip_s=$(echo $ip_s | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[
 	# Check saved 2D Laser IP address is OK
 	arping -f -q -c 2 -i eth0 $ip_s
 	[ $? -eq 0 ] && ip_c=$ip_s
-	#ip_c=$(/flash/arp-scan -q -x -i 1u -r 1 -I eth0 $ip_s | grep -o $ip_s)
 	[ ! -z "$ip_c" ] && {
 		echo "Checked 2D Laser IP =" $ip_c
 		exit 0
@@ -23,10 +22,18 @@ ip_s=$(echo $ip_s | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[
 	echo "Saved 2D Laser IP is not valid!"
 	}
 
+# Get my IP
+ip_m=$(ip a show eth0 | grep -E -o 'inet 10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)' | cut -d' ' -f2)
+[ -z "$ip_m" ] && {
+	echo "My IP is not valid!"
+	exit 1
+	}
+echo "My IP =" $ip_m
+
 # Looping to scan 2D Laser IP address
 while true; do
 	echo "Scan 2D Laser IP..."
-	ip_r=$(/flash/arp-scan -q -x -i 1u -r 1 -I eth0 10.0.0.0/16 | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[0-9]{1,2}($|[^0-9])' | tr '\t' ' ' | cut -d' ' -f1)
+	ip_r=$(/flash/arp-scan -q -x -g -i 20u -r 5 -R -N -f /flash/ip_list.txt -I eth0 --arpspa $ip_m | grep -E -o '10\.0\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.[0-9]{1,2}($|[^0-9])' | tr '\t' ' ' | cut -d' ' -f1)
 	[ ! -z "$ip_r" ] && break
 	echo "Not found 2D Laser IP..."
 	sleep 1
